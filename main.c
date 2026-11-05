@@ -22,8 +22,8 @@ int walking(const char *path, int indent){
   struct dirent *dp;
   while ((dp= readdir(dir))!=NULL) {
     const char *name = dp->d_name;
-    printf("%s\n", name);
-    if((strcmp(name, "."))==0 || strcmp(name, "..")){ // ignore files
+    //printf("%s\n", name);
+    if((strcmp(name, "."))==0 || strcmp(name, "..")==0){ // ignore files
       continue;
     }
     if ((dp->d_type)==DT_DIR){
@@ -43,7 +43,7 @@ int walking(const char *path, int indent){
 int main(int argc, char **argv){
   const char *path = "."; // default path is current directory
   if (argc>1){
-    path = argv[0];
+    path = argv[1];
   }
   //printf("path %s\n",path);
   int err = walking(path,0);
