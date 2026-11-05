@@ -1,0 +1,51 @@
+#include <stddef.h>
+#include<stdio.h>
+#include<dirent.h>
+#include<string.h>
+
+//#define YELLOW "\e[0;33m"
+void pFIles(const char *name, int is_dir, int indent){
+  if(indent)
+    printf("%*c",indent * 2, ' ');
+  if(is_dir){
+    printf("\033[0;33m%s\033[0m\n",name);
+  } else{
+    printf("%s\n", name);
+  }
+}
+int walking(const char *path, int indent){
+  DIR *dir = opendir(path);
+  if(!dir){
+    perror("opendir");
+    return 1;
+  }
+  struct dirent *dp;
+  while ((dp= readdir(dir))!=NULL) {
+    const char *name = dp->d_name;
+    printf("%s\n", name);
+    if((strcmp(name, "."))==0 || strcmp(name, "..")){ // ignore files
+      continue;
+    }
+    if ((dp->d_type)==DT_DIR){
+      pFIles(name,1,indent);
+      // walking to sub path 
+      size_t len = strlen(path)+strlen(name)+2;
+      char sub_path[len];
+      snprintf(sub_path,len, "%s/%s",path,name);
+      walking(sub_path, indent+1);
+    }else{
+      pFIles(name,0,indent);
+    }
+  }
+  closedir(dir);
+  return 0;
+}
+int main(int argc, char **argv){
+  const char *path = "."; // default path is current directory
+  if (argc>1){
+    path = argv[0];
+  }
+  //printf("path %s\n",path);
+  int err = walking(path,0);
+  return err;
+}
